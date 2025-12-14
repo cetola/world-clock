@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="A website for kindle to show time as a wallpaper">
   <meta charset="UTF-8">
   <title>Kindle Clock</title>
@@ -12,6 +12,12 @@
       box-sizing: border-box;
     }
 
+    html {
+      width: 1100px;
+      height: 900px;
+      overflow: hidden;
+    }
+
     body {
       background: white;
       font-family: 'Orbitron', 'Arial Narrow', sans-serif;
@@ -19,10 +25,13 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      min-height: 900px;
+      width: 1100px;
+      height: 900px;
       padding: 20px;
       position: relative;
       transition: transform 0.5s ease;
+      overflow: hidden;
     }
 
     body.rotate-90 {
@@ -125,20 +134,24 @@
       display: flex;
       gap: 40px;
       align-items: center;
+      flex-direction: row;
     }
 
     .clock-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex-shrink: 0;
     }
 
     .clock-wrapper.primary {
       transform: scale(1.2);
+      order: 1;
     }
 
     .clock-wrapper.secondary {
       transform: scale(0.8);
+      order: 2;
     }
 
     .timezone-label {
