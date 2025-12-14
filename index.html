@@ -66,7 +66,7 @@
       border: none;
       padding: 10px 20px;
       font-family: 'Orbitron', 'Arial Narrow', sans-serif;
-      font-size: 14px;
+      font-size: 21px;
       font-weight: 700;
       cursor: pointer;
       border-radius: 4px;
@@ -142,7 +142,7 @@
     }
 
     .timezone-label {
-      font-size: 16px;
+      font-size: 24px;
       font-weight: 600;
       margin-top: 5px;
       color: #333;
@@ -166,13 +166,13 @@
 
     .small-time-display {
       font-family: 'Orbitron', 'Arial Narrow', sans-serif;
-      font-size: 24px;
+      font-size: 36px;
       font-weight: 700;
       color: #000;
     }
 
     .small-time-label {
-      font-size: 14px;
+      font-size: 21px;
       color: #666;
       margin-top: 2px;
     }
@@ -185,23 +185,23 @@
 
     .column {
       position: relative;
-      height: 80px;
+      height: 120px;
       overflow: hidden;
     }
 
     .num {
-      font-size: 70px;
+      font-size: 105px;
       font-weight: 900;
-      line-height: 80px;
+      line-height: 120px;
       color: #000;
       transition: transform 0.3s ease;
       letter-spacing: -2px;
     }
 
     .colon {
-      font-size: 70px;
+      font-size: 105px;
       font-weight: 900;
-      line-height: 80px;
+      line-height: 120px;
       color: #000;
       transition: opacity 0.1s ease;
       display: flex;
@@ -360,7 +360,7 @@
   <script>
     let is24Hour = false;
     let showWorld = true;
-    let rotationDegrees = 0;
+    let rotationDegrees = 90;
 
     function updateClock(clockId, timezone) {
       const clock = document.getElementById(clockId);
@@ -401,7 +401,7 @@
       column.style.visibility = 'visible';
       const digitNum = parseInt(digit);
       const nums = column.querySelectorAll('.num');
-      const offset = -digitNum * 80;
+      const offset = -digitNum * 120;
       
       nums.forEach((num, index) => {
         num.style.transform = `translateY(${offset}px)`;
@@ -423,6 +423,10 @@
     }
 
     function init() {
+      // Set initial state
+      document.body.classList.add('inverted');
+      document.body.classList.add('rotate-90');
+      
       updateClock('clock-pacific', 'America/Los_Angeles');
       updateClock('clock-eastern', 'America/New_York');
       updateSmallTime('time-london', 'Europe/London');
