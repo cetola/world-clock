@@ -22,6 +22,19 @@
       min-height: 100vh;
       padding: 20px;
       position: relative;
+      transition: transform 0.5s ease;
+    }
+
+    body.rotate-90 {
+      transform: rotate(90deg);
+    }
+
+    body.rotate-180 {
+      transform: rotate(180deg);
+    }
+
+    body.rotate-270 {
+      transform: rotate(270deg);
     }
 
     .toggle-container {
@@ -38,6 +51,13 @@
     .toggle-container.bottom-left {
       top: auto;
       bottom: 20px;
+    }
+
+    .toggle-container.bottom-right {
+      top: auto;
+      bottom: 20px;
+      left: auto;
+      right: 20px;
     }
 
     .toggle-btn {
@@ -217,6 +237,10 @@
   <div class="toggle-container bottom-left">
     <button class="toggle-btn" id="toggleInvert">Invert</button>
   </div>
+
+  <div class="toggle-container bottom-right">
+    <button class="toggle-btn" id="toggleRotate">Rotate</button>
+  </div>
   
   <div class="container">
     <div class="clock-wrapper primary">
@@ -336,6 +360,7 @@
   <script>
     let is24Hour = false;
     let showWorld = true;
+    let rotationDegrees = 0;
 
     function updateClock(clockId, timezone) {
       const clock = document.getElementById(clockId);
@@ -444,6 +469,20 @@
       const toggleInvertBtn = document.getElementById('toggleInvert');
       toggleInvertBtn.addEventListener('click', () => {
         document.body.classList.toggle('inverted');
+      });
+
+      // Toggle rotation
+      const toggleRotateBtn = document.getElementById('toggleRotate');
+      toggleRotateBtn.addEventListener('click', () => {
+        rotationDegrees = (rotationDegrees + 90) % 360;
+        document.body.classList.remove('rotate-90', 'rotate-180', 'rotate-270');
+        if (rotationDegrees === 90) {
+          document.body.classList.add('rotate-90');
+        } else if (rotationDegrees === 180) {
+          document.body.classList.add('rotate-180');
+        } else if (rotationDegrees === 270) {
+          document.body.classList.add('rotate-270');
+        }
       });
     }
 
