@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A website for kindle to show time as a wallpaper">
+  <meta charset="UTF-8">
+  <title>Kindle Clock</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: white;
+      font-family: 'Orbitron', 'Arial Narrow', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .toggle-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .toggle-container.top-right {
+      left: auto;
+      right: 20px;
+    }
+
+    .toggle-container.bottom-left {
+      top: auto;
+      bottom: 20px;
+    }
+
+    .toggle-btn {
+      background: #000;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Orbitron', 'Arial Narrow', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-btn:hover {
+      background: #333;
+    }
+
+    .toggle-btn:active {
+      background: #555;
+    }
+
+    body.inverted {
+      background: #000;
+    }
+
+    body.inverted .toggle-btn {
+      background: #fff;
+      color: #000;
+    }
+
+    body.inverted .toggle-btn:hover {
+      background: #ddd;
+    }
+
+    body.inverted .toggle-btn:active {
+      background: #bbb;
+    }
+
+    body.inverted .num,
+    body.inverted .colon,
+    body.inverted .small-time-display {
+      color: #fff;
+    }
+
+    body.inverted .timezone-label,
+    body.inverted .small-time-label {
+      color: #ccc;
+    }
+
+    .world-times {
+      transition: opacity 0.3s ease, max-height 0.3s ease;
+    }
+
+    .world-times.hidden {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Dancing+Script:wght@600&display=swap');
+
+    .container {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .clock-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .clock-wrapper.primary {
+      transform: scale(1.2);
+    }
+
+    .clock-wrapper.secondary {
+      transform: scale(0.8);
+    }
+
+    .timezone-label {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 5px;
+      color: #333;
+      font-family: 'Dancing Script', cursive;
+    }
+
+    .additional-times {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      font-family: 'Dancing Script', cursive;
+      justify-content: center;
+    }
+
+    .small-time {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .small-time-display {
+      font-family: 'Orbitron', 'Arial Narrow', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .small-time-label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .clock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .column {
+      position: relative;
+      height: 80px;
+      overflow: hidden;
+    }
+
+    .num {
+      font-size: 70px;
+      font-weight: 900;
+      line-height: 80px;
+      color: #000;
+      transition: transform 0.3s ease;
+      letter-spacing: -2px;
+    }
+
+    .colon {
+      font-size: 70px;
+      font-weight: 900;
+      line-height: 80px;
+      color: #000;
+      transition: opacity 0.1s ease;
+      display: flex;
+      align-items: center;
+      padding-bottom: 8px;
+    }
+
+    .colon.blink {
+      opacity: 0;
+    }
+
+    .colon::before {
+      content: ':';
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        gap: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="toggle-container">
+    <button class="toggle-btn" id="toggleFormat">24 Hour</button>
+  </div>
+  
+  <div class="toggle-container top-right">
+    <button class="toggle-btn" id="toggleWorld">Hide World</button>
+  </div>
+
+  <div class="toggle-container bottom-left">
+    <button class="toggle-btn" id="toggleInvert">Invert</button>
+  </div>
+  
+  <div class="container">
+    <div class="clock-wrapper primary">
+      <div class="clock" id="clock-pacific">
+        <div class="column" data-digit="h1">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+        </div>
+        <div class="column" data-digit="h2">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+          <div class="num">6</div>
+          <div class="num">7</div>
+          <div class="num">8</div>
+          <div class="num">9</div>
+        </div>
+        <div class="colon"></div>
+        <div class="column" data-digit="m1">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+        </div>
+        <div class="column" data-digit="m2">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+          <div class="num">6</div>
+          <div class="num">7</div>
+          <div class="num">8</div>
+          <div class="num">9</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="clock-wrapper secondary">
+      <div class="clock" id="clock-eastern">
+        <div class="column" data-digit="h1">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+        </div>
+        <div class="column" data-digit="h2">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+          <div class="num">6</div>
+          <div class="num">7</div>
+          <div class="num">8</div>
+          <div class="num">9</div>
+        </div>
+        <div class="colon"></div>
+        <div class="column" data-digit="m1">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+        </div>
+        <div class="column" data-digit="m2">
+          <div class="num">0</div>
+          <div class="num">1</div>
+          <div class="num">2</div>
+          <div class="num">3</div>
+          <div class="num">4</div>
+          <div class="num">5</div>
+          <div class="num">6</div>
+          <div class="num">7</div>
+          <div class="num">8</div>
+          <div class="num">9</div>
+        </div>
+      </div>
+      <div class="timezone-label">New York</div>
+      <div class="world-times">
+        <div class="additional-times">
+          <div class="small-time">
+            <div class="small-time-display" id="time-london">--:--</div>
+            <div class="small-time-label">London</div>
+          </div>
+          <div class="small-time">
+            <div class="small-time-display" id="time-paris">--:--</div>
+            <div class="small-time-label">Paris</div>
+          </div>
+        </div>
+        <div class="additional-times">
+          <div class="small-time">
+            <div class="small-time-display" id="time-tokyo">--:--</div>
+            <div class="small-time-label">Tokyo</div>
+          </div>
+          <div class="small-time">
+            <div class="small-time-display" id="time-shanghai">--:--</div>
+            <div class="small-time-label">Shanghai</div>
+          </div>
+          <div class="small-time">
+            <div class="small-time-display" id="time-bangalore">--:--</div>
+            <div class="small-time-label">Bangalore</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let is24Hour = false;
+    let showWorld = true;
+
+    function updateClock(clockId, timezone) {
+      const clock = document.getElementById(clockId);
+      const now = new Date();
+      const options = { timeZone: timezone, hour12: !is24Hour };
+      const timeStr = now.toLocaleTimeString('en-US', options);
+      const [hoursStr, minutes] = timeStr.split(':');
+
+      // Parse the hour as a number
+      let hourNum = parseInt(hoursStr);
+      
+      // Format hours: hide leading zero only for single digits (1-9)
+      let h1, h2;
+      if (hourNum < 10) {
+        h1 = ' ';
+        h2 = hourNum.toString();
+      } else {
+        h1 = hoursStr[0];
+        h2 = hoursStr[1];
+      }
+      
+      const m1 = minutes[0];
+      const m2 = minutes[1];
+
+      animateDigit(clock.querySelector('[data-digit="h1"]'), h1);
+      animateDigit(clock.querySelector('[data-digit="h2"]'), h2);
+      animateDigit(clock.querySelector('[data-digit="m1"]'), m1);
+      animateDigit(clock.querySelector('[data-digit="m2"]'), m2);
+    }
+
+    function animateDigit(column, digit) {
+      if (digit === ' ') {
+        // Hide the column for leading zero
+        column.style.visibility = 'hidden';
+        return;
+      }
+      
+      column.style.visibility = 'visible';
+      const digitNum = parseInt(digit);
+      const nums = column.querySelectorAll('.num');
+      const offset = -digitNum * 80;
+      
+      nums.forEach((num, index) => {
+        num.style.transform = `translateY(${offset}px)`;
+      });
+    }
+
+    function updateSmallTime(elementId, timezone) {
+      const element = document.getElementById(elementId);
+      const now = new Date();
+      const options = { timeZone: timezone, hour12: !is24Hour, hour: '2-digit', minute: '2-digit' };
+      let timeStr = now.toLocaleTimeString('en-US', options);
+      
+      // Remove leading zero if present
+      if (timeStr.startsWith('0')) {
+        timeStr = timeStr.substring(1);
+      }
+      
+      element.textContent = timeStr;
+    }
+
+    function init() {
+      updateClock('clock-pacific', 'America/Los_Angeles');
+      updateClock('clock-eastern', 'America/New_York');
+      updateSmallTime('time-london', 'Europe/London');
+      updateSmallTime('time-paris', 'Europe/Paris');
+      updateSmallTime('time-tokyo', 'Asia/Tokyo');
+      updateSmallTime('time-shanghai', 'Asia/Shanghai');
+      updateSmallTime('time-bangalore', 'Asia/Kolkata');
+      
+      setInterval(() => {
+        updateClock('clock-pacific', 'America/Los_Angeles');
+        updateClock('clock-eastern', 'America/New_York');
+        updateSmallTime('time-london', 'Europe/London');
+        updateSmallTime('time-paris', 'Europe/Paris');
+        updateSmallTime('time-tokyo', 'Asia/Tokyo');
+        updateSmallTime('time-shanghai', 'Asia/Shanghai');
+        updateSmallTime('time-bangalore', 'Asia/Kolkata');
+      }, 1000);
+
+      // Blink colons every second
+      setInterval(() => {
+        const colons = document.querySelectorAll('.colon');
+        colons.forEach(colon => colon.classList.toggle('blink'));
+      }, 1000);
+
+      // Toggle 12/24 hour format
+      const toggleBtn = document.getElementById('toggleFormat');
+      toggleBtn.addEventListener('click', () => {
+        is24Hour = !is24Hour;
+        toggleBtn.textContent = is24Hour ? '12 Hour' : '24 Hour';
+        updateClock('clock-pacific', 'America/Los_Angeles');
+        updateClock('clock-eastern', 'America/New_York');
+      });
+
+      // Toggle world times
+      const toggleWorldBtn = document.getElementById('toggleWorld');
+      const worldTimes = document.querySelector('.world-times');
+      toggleWorldBtn.addEventListener('click', () => {
+        showWorld = !showWorld;
+        toggleWorldBtn.textContent = showWorld ? 'Hide World' : 'Show World';
+        worldTimes.classList.toggle('hidden');
+      });
+
+      // Toggle inverted colors
+      const toggleInvertBtn = document.getElementById('toggleInvert');
+      toggleInvertBtn.addEventListener('click', () => {
+        document.body.classList.toggle('inverted');
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
