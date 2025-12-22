@@ -86,6 +86,13 @@
       right: 20px;
     }
 
+    .toggle-container.bottom-center {
+      top: auto;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
     .toggle-btn {
       background: #000;
       color: #fff;
@@ -112,16 +119,16 @@
     }
 
     body.inverted .toggle-btn {
-      background: #fff;
-      color: #000;
+      background: #333;
+      color: #fff;
     }
 
     body.inverted .toggle-btn:hover {
-      background: #ddd;
+      background: #444;
     }
 
     body.inverted .toggle-btn:active {
-      background: #bbb;
+      background: #555;
     }
 
     body.inverted .num,
@@ -289,6 +296,10 @@
   <div class="toggle-container bottom-right">
     <button class="toggle-btn" id="toggleRotate">Rotate</button>
   </div>
+
+  <div class="toggle-container bottom-center">
+    <button class="toggle-btn" id="toggleBlink">Blink On</button>
+  </div>
   
   <div class="container">
     <div class="clock-wrapper primary">
@@ -409,6 +420,8 @@
     let is24Hour = false;
     let showWorld = true;
     let rotationDegrees = 90;
+    let isBlinking = false;
+    let blinkInterval = null;
 
     function updateClock(clockId, timezone) {
       const clock = document.getElementById(clockId);
@@ -493,11 +506,31 @@
         updateSmallTime('time-bangalore', 'Asia/Kolkata');
       }, 1000);
 
-      // Blink colons every second
-      setInterval(() => {
-        const colons = document.querySelectorAll('.colon');
-        colons.forEach(colon => colon.classList.toggle('blink'));
-      }, 1000);
+      // Function to toggle blinking
+      function toggleBlinking() {
+        if (isBlinking) {
+          if (blinkInterval) {
+            clearInterval(blinkInterval);
+            blinkInterval = null;
+          }
+          // Remove blink class from all colons
+          const colons = document.querySelectorAll('.colon');
+          colons.forEach(colon => colon.classList.remove('blink'));
+        } else {
+          blinkInterval = setInterval(() => {
+            const colons = document.querySelectorAll('.colon');
+            colons.forEach(colon => colon.classList.toggle('blink'));
+          }, 1000);
+        }
+      }
+
+      // Toggle blink button
+      const toggleBlinkBtn = document.getElementById('toggleBlink');
+      toggleBlinkBtn.addEventListener('click', () => {
+        isBlinking = !isBlinking;
+        toggleBlinkBtn.textContent = isBlinking ? 'Blink Off' : 'Blink On';
+        toggleBlinking();
+      });
 
       // Toggle 12/24 hour format
       const toggleBtn = document.getElementById('toggleFormat');
