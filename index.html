@@ -43,7 +43,7 @@
     }
 
     body.rotate-270 {
-      transform: rotate(270deg);
+      transform: rotate(270deg) translateX(-100px) translateY(-50px);
     }
 
     .toggle-container {
@@ -486,7 +486,7 @@
     function init() {
       // Set initial state
       document.body.classList.add('inverted');
-      document.body.classList.add('rotate-90');
+      document.body.classList.add('rotate-270');
       
       updateClock('clock-pacific', 'America/Los_Angeles');
       updateClock('clock-eastern', 'America/New_York');
